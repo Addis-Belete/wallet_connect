@@ -1,38 +1,54 @@
-import SignClient from "@walletconnect/sign-client";
-import { Web3Modal } from "@web3modal/standalone";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import { useState } from "react"
+import { ethers } from "ethers"
 
-export default function () {
-
+export default function home() {
+	const [web3Provider, setWeb3Provider] = useState(undefined);
 	const connect = async () => {
 
-		const web3Modal = new Web3Modal({
-			projectId: "7fd42875a6445e555539546b550b6fc9",
-			standaloneChains: ["eip155:1"],
-		});
-		const signClient = await SignClient.init({ projectId: "7fd42875a6445e555539546b550b6fc9" });
+		const provider = new WalletConnectProvider({
 
-		const { uri, approval } = await signClient.connect({
-			requiredNamespaces: {
-				eip155: {
-					methods: ["eth_sign"],
-					chains: ["eip155:1"],
-					events: ["accountsChanged"],
-				},
+			rpc: {
+				250: "https://rpc.ftm.tools/s",
+				80001: "https://rpc-mumbai.maticvigil.com"
 			},
+			infuraId: "b8eb81a4d5a641959e281924bf72905e",
+			qrcodeModalOptions: {
+				desktopLinks: [
+					'ledger',
+					'tokenary',
+					'wallet',
+					'wallet 3',
+					'secuX',
+					'ambire',
+					'wallet3',
+					'apolloX',
+					'zerion',
+					'sequence',
+					'punkWallet',
+					'kryptoGO',
+					'nft',
+					'riceWallet',
+					'vision',
+					'keyring'
+				],
+				mobileLinks: [
+					"rainbow",
+					"metamask",
+					"argent",
+					"trust",
+					"imtoken",
+					"pillar",
+				]
+			}
 		});
+		await provider.enable()
+		const prov = new ethers.providers.Web3Provider(provider);
 
-		if (uri) {
-			web3Modal.openModal({ uri, standaloneChains: ["eip155:1"] });
-			await approval();
-			web3Modal.closeModal();
-		}
-
+		setWeb3Provider(prov);
 	}
-	return (
-		<>
-			<button onClick={() => connect()}>Wallet Connect</button>
-		</>
-	)
 
+	console.log(web3Provider);
+	return (<button onClick={() => connect()}>Connect Wallet</button>)
 
 }
